@@ -60,7 +60,6 @@ float* EstimatePlaneImplicit(vector<Point3f> pts)
     ret[3]=D/norm;
 
     return ret;
-
 }
 
     
@@ -221,3 +220,31 @@ RANSACDiffs PlanePointRANSACDifferences(vector<Point3f> pts, float* plane, float
         
     return ret;
 }
+
+RANSACDiffs findDifferences(vector<Point3f> points, float threshold, int iter)
+{
+
+    // Estimate plane parameters without robustification
+
+    float* plane = EstimatePlaneImplicit(points);
+    printf("Plane fitting results for the whole data:\nA:%f B:%f C:%f D:%f\n", plane[0], plane[1], plane[2], plane[3]);
+
+    delete[] plane;
+
+    // RANSAC-based robust estimation
+
+    float* planeParams = EstimatePlaneRANSAC(points, threshold, iter);
+
+    printf("Plane params RANSAC:\n A:%f B:%f C:%f D:%f \n", planeParams[0], planeParams[1], planeParams[2], planeParams[3]);
+
+    // Compute differences of the fitted plane in order to separate inliers from outliers
+
+    RANSACDiffs differences = PlanePointRANSACDifferences(points, planeParams, threshold);
+
+    delete[] planeParams;
+
+    // Inliers and outliers are coloured by green and red, respectively
+
+    return differences;
+}
+

@@ -27,5 +27,6 @@ typedef struct RANSACDiffs
 float* EstimatePlaneImplicit(vector<Point3f>);
 float* EstimatePlaneRANSAC(vector<Point3f>,float,int);
 RANSACDiffs PlanePointRANSACDifferences(vector<Point3f> pts, float* plane, float threshold);
+RANSACDiffs findDifferences(vector<Point3f> points, float threshold, int iter);
 
 #endif

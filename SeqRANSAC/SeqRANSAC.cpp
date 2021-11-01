@@ -6,7 +6,7 @@
 
 using namespace cv;
 
-#define THERSHOLD 0.2 // RANSAC threshold (if Velodyne scans are processed, the unit is meter)
+#define THRESHOLD 0.2 // RANSAC threshold (if Velodyne scans are processed, the unit is meter)
 #define RANSAC_ITER  200 // RANSAC iteration
 #define FILTER_LOWEST_DISTANCE 0.3 // threshold for pre-filtering
 
@@ -47,13 +47,18 @@ int main(int argc, char** argv)
            newPt.y=y;
            newPt.z=z;
            points.push_back(newPt);
-       }
-       
+       }       
     }   
     
     // Number of points:
 
-    num=points.size();    
+    num=points.size();
+
+    for (int i = 0; i < 3; i++)
+    {
+
+    }
+    /*
     
     // Estimate plane parameters without robustification
     
@@ -75,6 +80,9 @@ int main(int argc, char** argv)
     delete[] planeParams;    
     
     // Inliers and outliers are coloured by green and red, respectively
+
+    */
+    RANSACDiffs differences = findDifferences(points, THRESHOLD, RANSAC_ITER);
     
     vector<Point3i> colorsRANSAC;
     

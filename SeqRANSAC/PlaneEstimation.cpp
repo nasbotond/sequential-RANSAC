@@ -221,6 +221,7 @@ RANSACDiffs PlanePointRANSACDifferences(vector<Point3f> pts, float* plane, float
     return ret;
 }
 
+// function that combined the other functions to find the differences
 RANSACDiffs findDifferences(vector<Point3f> points, float threshold, int iter)
 {
 

@@ -50,65 +50,88 @@ int main(int argc, char** argv)
        }       
     }   
     
-    // Number of points:
-
+    // number of initial points
     num=points.size();
+
+    // final vector of points and colors with indices synchronized
+    vector<Point3f> final_points;
+    vector<Point3i> colorsRANSAC;
+
+    RANSACDiffs differences = findDifferences(points, THRESHOLD, RANSAC_ITER);
+
+    // other necessary variables
+    vector<Point3f> new_points;
+    Point3i color;
+    Point3f current_point;
 
     for (int i = 0; i < 3; i++)
     {
-
-    }
-    /*
-    
-    // Estimate plane parameters without robustification
-    
-    float* plane=EstimatePlaneImplicit(points);
-    printf("Plane fitting results for the whole data:\nA:%f B:%f C:%f D:%f\n",plane[0],plane[1],plane[2],plane[3]);
-    
-    delete[] plane;    
-    
-    // RANSAC-based robust estimation
-    
-    float* planeParams=EstimatePlaneRANSAC(points,THERSHOLD,RANSAC_ITER);
-    
-    printf("Plane params RANSAC:\n A:%f B:%f C:%f D:%f \n",planeParams[0],planeParams[1],planeParams[2],planeParams[3]);
-    
-    // Compute differences of the fitted plane in order to separate inliers from outliers
-    
-    RANSACDiffs differences=PlanePointRANSACDifferences(points,planeParams,THERSHOLD);
-
-    delete[] planeParams;    
-    
-    // Inliers and outliers are coloured by green and red, respectively
-
-    */
-    RANSACDiffs differences = findDifferences(points, THRESHOLD, RANSAC_ITER);
-    
-    vector<Point3i> colorsRANSAC;
-    
-    for (int idx=0; idx<num; idx++)
-    {
-        Point3i newColor;
-
-        if (differences.isInliers.at(idx))
+        for (int idx = 0; idx < num; idx++)
         {
-           newColor.x=0;
-           newColor.y=255;
-           newColor.z=0;
-        }
-        else
-        {
-           newColor.x=255;
-           newColor.y=0;
-           newColor.z=0;
+            // colors depend on iteration (which plane we're looking for)
+            switch (i)
+            {
+                case 0:
+                    color.x = 255;
+                    color.y = 0;
+                    color.z = 0;
+                    break;
+                case 1:
+                    color.x = 0;
+                    color.y = 255;
+                    color.z = 0;
+                    break;
+                case 2:
+                    color.x = 255;
+                    color.y = 153;
+                    color.z = 255;
+                    break;
+            }            
+
+            current_point = points.at(idx);
+
+            if (differences.isInliers.at(idx))
+            {
+                final_points.push_back(current_point);
+                colorsRANSAC.push_back(color);
+            }
+            else
+            {
+                new_points.push_back(current_point);
+            }
         }
         
-        colorsRANSAC.push_back(newColor);            
+        num = new_points.size(); // number of points after detected plane points are removed (outlier points)
+        points.clear();
+        points = new_points;
+        printf("Number of outlier points for iteration (i.e., deteted plane) number %i: %i\n", i+1, num);
+
+        if (i < 2)
+        {
+            differences = findDifferences(new_points, THRESHOLD, RANSAC_ITER);
+            new_points.clear();
+        }
+        // the remainder outlier points (colored blue) can be added using this code block
+        /*
+        else
+        {
+            for (int idx = 0; idx < num; idx++)
+            {
+                color.x = 0;
+                color.y = 0;
+                color.z = 255;
+
+                current_point = points.at(idx);
+
+                final_points.push_back(current_point);
+                colorsRANSAC.push_back(color);
+            }
+        }
+        */
     }
     
     // Write results into a PLY file. 
     // It can be visualized by open-source 3D application Meshlab (www.meshlab.org)
 
-    WritePLY(argv[2],points,colorsRANSAC);
-        
+    WritePLY(argv[2], final_points, colorsRANSAC);        
 }

@@ -62,6 +62,46 @@ float* EstimatePlaneImplicit(vector<Point3f> pts)
     return ret;
 }
 
+float* EstimatePlaneOptimal(vector<Point3f> pts)
+{
+    int num = pts.size();
+
+    Mat Cfs(num, 4, CV_32F);
+
+    //Get points
+    for (int idx = 0; idx < num; idx++)
+    {
+        Point3d pt = pts.at(idx);
+        Cfs.at<float>(idx, 0) = pt.x;
+        Cfs.at<float>(idx, 1) = pt.y;
+        Cfs.at<float>(idx, 2) = pt.z;
+        Cfs.at<float>(idx, 3) = 1.0f;
+    }
+
+    Mat mtx = Cfs.t() * Cfs;
+    Mat evals, evecs;
+
+    eigen(mtx, evals, evecs);
+
+    // normalize plane normal;
+
+    float A = evecs.at<float>(3, 0);
+    float B = evecs.at<float>(3, 1);
+    float C = evecs.at<float>(3, 2);
+    float D = evecs.at<float>(3, 3);
+
+    float norm = sqrt(A * A + B * B + C * C); // Plane parameters are normalized
+
+    float* ret = new float[4];
+
+    ret[0] = A / norm;
+    ret[1] = B / norm;
+    ret[2] = C / norm;
+    ret[3] = D / norm;
+
+    return ret;
+}
+
     
 /* Plane Estimation
  * Goal: Fit plane to the given spatial points. The fitting is robust, RANSAC method is applied

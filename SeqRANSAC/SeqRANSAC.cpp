@@ -58,6 +58,10 @@ int main(int argc, char** argv)
     vector<Point3i> colorsRANSAC;
 
     RANSACDiffs differences = findDifferences(points, THRESHOLD, RANSAC_ITER);
+    /*
+    Mat pl = EstimatePlaneOptimal(points);
+    cout << "M = " << endl << " " << pl << endl << endl;
+    */
 
     // other necessary variables
     vector<Point3f> new_points;

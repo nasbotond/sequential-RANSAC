@@ -6,15 +6,15 @@
 
 using namespace cv;
 
-#define THRESHOLD 0.2 // RANSAC threshold (if Velodyne scans are processed, the unit is meter)
-#define RANSAC_ITER  200 // RANSAC iteration
+#define THRESHOLD 0.3 //0.2 // RANSAC threshold (if Velodyne scans are processed, the unit is meter)
+#define RANSAC_ITER  500 //200 // RANSAC iteration
 #define FILTER_LOWEST_DISTANCE 0.3 // threshold for pre-filtering
 
 int main(int argc, char** argv)
 {    
     if (argc!=3)
     {
-        printf("Usage:\n SeqRansac input.xyz output.ply\n");
+        printf("Usage:\n SeqRANSAC.exe input.xyz output.ply\n");
         exit(EXIT_FAILURE);
     }
     
@@ -58,10 +58,6 @@ int main(int argc, char** argv)
     vector<Point3i> colorsRANSAC;
 
     RANSACDiffs differences = findDifferences(points, THRESHOLD, RANSAC_ITER);
-    /*
-    Mat pl = EstimatePlaneOptimal(points);
-    cout << "M = " << endl << " " << pl << endl << endl;
-    */
 
     // other necessary variables
     vector<Point3f> new_points;
@@ -87,8 +83,8 @@ int main(int argc, char** argv)
                     break;
                 case 2:
                     color.x = 255;
-                    color.y = 153;
-                    color.z = 255;
+                    color.y = 105;
+                    color.z = 180;
                     break;
             }            
 
@@ -108,22 +104,21 @@ int main(int argc, char** argv)
         num = new_points.size(); // number of points after detected plane points are removed (outlier points)
         points.clear();
         points = new_points;
-        printf("Number of outlier points for iteration (i.e., deteted plane) number %i: %i\n", i+1, num);
+        printf("Number of outlier points for iteration (i.e., detected plane) number %i: %i\n", i+1, num);
 
         if (i < 2)
         {
             differences = findDifferences(new_points, THRESHOLD, RANSAC_ITER);
             new_points.clear();
         }
-        // the remainder outlier points (colored blue) can be added using this code block
-        /*
+        // the remainder outlier points (colored black) can be added using this code block        
         else
         {
             for (int idx = 0; idx < num; idx++)
             {
                 color.x = 0;
                 color.y = 0;
-                color.z = 255;
+                color.z = 0;
 
                 current_point = points.at(idx);
 
@@ -131,7 +126,6 @@ int main(int argc, char** argv)
                 colorsRANSAC.push_back(color);
             }
         }
-        */
     }
     
     // Write results into a PLY file. 

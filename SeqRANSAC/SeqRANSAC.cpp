@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     
     MatrixReaderWriter mrw(argv[1]);
     
-    int num=mrw.rowNum;
+    int num = mrw.rowNum;
     
     cout<< "Rows:" << num <<endl;
     cout<< "Cols:" << mrw.columnNum << endl;
@@ -29,29 +29,29 @@ int main(int argc, char** argv)
     
     vector<Point3f> points;
     
-    for (int idx=0;idx<num;idx++)
+    for (int idx = 0; idx < num; idx++)
     {
-       double x=mrw.data[3*idx];
-       double y=mrw.data[3*idx+1];
-       double z=mrw.data[3*idx+2];
+       double x = mrw.data[3*idx];
+       double y = mrw.data[3*idx+1];
+       double z = mrw.data[3*idx+2];
        
-       float distFromOrigo=sqrt(x*x+y*y+z*z);
+       float distFromOrigo = sqrt(x*x+y*y+z*z);
 
 
         // First filter: minimal work distance for a LiDAR limited.        
        
-       if (distFromOrigo>FILTER_LOWEST_DISTANCE)
+       if (distFromOrigo > FILTER_LOWEST_DISTANCE)
        {
            Point3f newPt;
-           newPt.x=x;
-           newPt.y=y;
-           newPt.z=z;
+           newPt.x = x;
+           newPt.y = y;
+           newPt.z = z;
            points.push_back(newPt);
        }       
     }   
     
     // number of initial points
-    num=points.size();
+    num = points.size();
 
     // final vector of points and colors with indices synchronized
     vector<Point3f> final_points;
